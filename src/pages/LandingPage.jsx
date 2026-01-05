@@ -2,7 +2,7 @@ import { Sparkles, ChevronRight, CheckCircle, PlayCircle, Star, Users } from 'lu
 
 const LandingPage = ({ onLoginClick }) => {
   return (
-    <div className="bg-white font-sans text-slate-800">
+    <div className="bg-white font-sans text-slate-800 h-screen overflow-y-auto">
       {/* 1. HERO SECTION */}
       <div className="relative overflow-hidden bg-slate-900 pt-16 pb-32 lg:pt-32 lg:pb-48">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2942&auto=format&fit=crop')] bg-cover bg-center opacity-10"></div>
