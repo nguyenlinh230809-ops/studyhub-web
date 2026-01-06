@@ -3,14 +3,37 @@ import {
   BarChart3, Users, BookOpen, DollarSign, TrendingUp, Trash2, Ban, 
   CheckCircle, Activity, PieChart as PieIcon, Megaphone, Settings, 
   Search, Edit, Download, ArrowDownLeft, ArrowUpRight, CheckCircle2,
-  Plus // Thêm icon Plus
+  Plus 
 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
-// Bổ sung prop onAddNewCourse vào tham số nhận vào
 const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => {
   const activeTab = page === 'home' ? 'dashboard' : page; 
+
+  // --- 1. TẠO DỮ LIỆU GIẢ LẬP 20 NGƯỜI DÙNG ---
+  const mockUsers = [
+    { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@gmail.com", role: "Student", status: "Active", joined: "20/12/2025" },
+    { id: 2, name: "Trần Thị Bích", email: "bich.tran@studyhub.vn", role: "Teacher", status: "Active", joined: "15/11/2025" },
+    { id: 3, name: "Lê Hoàng Cường", email: "admin.cuong@studyhub.vn", role: "Admin", status: "Active", joined: "01/01/2025" },
+    { id: 4, name: "Phạm Minh Duy", email: "duy.pham@gmail.com", role: "Student", status: "Banned", joined: "05/12/2025" },
+    { id: 5, name: "Hoàng Gia Bảo", email: "bao.hoang@gmail.com", role: "Student", status: "Active", joined: "02/01/2026" },
+    { id: 6, name: "Vũ Thị Mai", email: "mai.vu@teacher.com", role: "Teacher", status: "Pending", joined: "10/01/2026" },
+    { id: 7, name: "Đặng Văn Hùng", email: "hung.dang@gmail.com", role: "Student", status: "Active", joined: "11/01/2026" },
+    { id: 8, name: "Bùi Thị Lan", email: "lan.bui@gmail.com", role: "Student", status: "Active", joined: "12/01/2026" },
+    { id: 9, name: "Ngô Kiến Huy", email: "huy.ngo@student.com", role: "Student", status: "Active", joined: "13/01/2026" },
+    { id: 10, name: "Lý Nhã Kỳ", email: "ky.ly@teacher.vn", role: "Teacher", status: "Active", joined: "14/01/2026" },
+    { id: 11, name: "Trương Thế Vinh", email: "vinh.truong@gmail.com", role: "Student", status: "Banned", joined: "15/01/2026" },
+    { id: 12, name: "Hồ Ngọc Hà", email: "ha.ho@partner.vn", role: "Teacher", status: "Active", joined: "16/01/2026" },
+    { id: 13, name: "Sơn Tùng MTP", email: "tung.mtp@music.vn", role: "Student", status: "Active", joined: "17/01/2026" },
+    { id: 14, name: "Đen Vâu", email: "den.vau@rap.vn", role: "Student", status: "Active", joined: "18/01/2026" },
+    { id: 15, name: "Chi Pu", email: "chi.pu@singer.vn", role: "Student", status: "Pending", joined: "19/01/2026" },
+    { id: 16, name: "Trấn Thành", email: "thanh.tran@mc.vn", role: "Teacher", status: "Active", joined: "20/01/2026" },
+    { id: 17, name: "Hari Won", email: "hari.won@korea.vn", role: "Student", status: "Active", joined: "21/01/2026" },
+    { id: 18, name: "Trường Giang", email: "giang.truong@comedy.vn", role: "Admin", status: "Active", joined: "22/01/2026" },
+    { id: 19, name: "Ninh Dương Lan Ngọc", email: "ngoc.ninh@actress.vn", role: "Student", status: "Active", joined: "23/01/2026" },
+    { id: 20, name: "Isaac", email: "isaac.365@lion.vn", role: "Student", status: "Active", joined: "24/01/2026" },
+  ];
 
   const platformRevenue = stats.revenue * 0.2; 
   const totalRevenue = stats.revenue;
@@ -19,7 +42,7 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
 
   return (
     <div className="space-y-8 animate-fade-in-up pb-10">
-      {/* HEADER - ĐÃ THÊM NÚT KHỞI TẠO KHÓA HỌC */}
+      {/* HEADER */}
       <div className="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
         <div>
             <span className="text-xs font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded">CEO Workspace</span>
@@ -30,14 +53,16 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
             </h2>
         </div>
 
-        {/* NÚT CHIẾN LƯỢC: Dành cho Admin tạo nhanh nội dung */}
-        <button 
-          onClick={onAddNewCourse}
-          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black text-sm hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl shadow-slate-200"
-        >
-          <Plus size={20} strokeWidth={3}/>
-          KHỞI TẠO KHÓA HỌC MỚI
-        </button>
+        {/* 2. CHỈ HIỆN NÚT KHI Ở DASHBOARD */}
+        {activeTab === 'dashboard' && (
+          <button 
+            onClick={onAddNewCourse}
+            className="flex items-center gap-2 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black text-sm hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl shadow-slate-200"
+          >
+            <Plus size={20} strokeWidth={3}/>
+            KHỞI TẠO KHÓA HỌC MỚI
+          </button>
+        )}
       </div>
 
       {/* DASHBOARD TAB */}
@@ -49,13 +74,11 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
               <h3 className="text-3xl font-black">{formatMoney(totalRevenue || 0)}</h3>
               <p className="text-indigo-200 text-sm font-medium">Tổng GMV</p>
             </div>
-            {/* Các card khác giữ nguyên nhưng bọc giá trị bằng || 0 để tránh lỗi khi ít dữ liệu */}
             <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-emerald-600"><Activity/><span className="bg-emerald-50 px-2 py-1 rounded text-xs font-bold">+12%</span></div><h3 className="text-3xl font-black text-slate-800">{formatMoney(platformRevenue || 0)}</h3><p className="text-slate-500 text-sm font-medium">Doanh thu Sàn</p></div>
             <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-blue-600"><Users/><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold">Active</span></div><h3 className="text-3xl font-black text-slate-800">{stats.users || 0}</h3><p className="text-slate-500 text-sm font-medium">Thành viên</p></div>
             <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-orange-600"><BookOpen/><span className="bg-orange-50 px-2 py-1 rounded text-xs font-bold">New</span></div><h3 className="text-3xl font-black text-slate-800">{courses.length || 0}</h3><p className="text-slate-500 text-sm font-medium">Khóa học hiện có</p></div>
           </div>
           
-          {/* Chart Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-sm border border-slate-200">
               <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2"><TrendingUp size={20}/> Tăng trưởng dòng tiền</h3>
@@ -74,7 +97,6 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
               </div>
             </div>
             
-            {/* Pie Chart */}
             <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-200">
               <h3 className="font-bold text-slate-800 mb-6">Cơ cấu doanh thu</h3>
               <div className="h-64">
@@ -91,7 +113,7 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
         </>
       )}
 
-      {/* FINANCE TAB - ĐÃ SỬA THÀNH DẠNG BẢNG */}
+      {/* FINANCE TAB */}
       {activeTab === 'finance' && (
          <div className="bg-white rounded-[32px] border border-slate-200 overflow-hidden shadow-sm">
             <div className="p-8 border-b border-slate-100 flex justify-between items-center">
@@ -129,8 +151,8 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
                             <span className="font-bold text-slate-700">{t.full_name || 'Khách vãng lai'}</span>
                           </div>
                         </td>
-// Ví dụ thay đổi logic hiển thị loại giao dịch
                         <td className="p-6">
+                          {/* Sửa lại logic hiển thị Thu/Chi */}
                           {t.type === 'income' ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
                               <ArrowDownLeft size={14}/> Thu tiền (IN)
@@ -167,24 +189,82 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
                 </tbody>
               </table>
             </div>
-            
-            {/* Phân trang (Giả lập) */}
-            <div className="p-6 border-t border-slate-100 flex justify-between items-center bg-slate-50/50">
-               <span className="text-xs font-bold text-slate-400">Hiển thị {stats.transactions?.length || 0} kết quả</span>
-               <div className="flex gap-2">
-                  <button className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50">Trước</button>
-                  <button className="px-3 py-1 bg-indigo-600 border border-indigo-600 rounded text-xs font-bold text-white shadow-sm">1</button>
-                  <button className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-500 hover:bg-slate-50">Sau</button>
-               </div>
-            </div>
          </div>
       )}
 
-      {/* USERS TAB */}
+      {/* USERS TAB - ĐÃ UPDATE HIỂN THỊ 20 NGƯỜI */}
       {activeTab === 'users' && (
         <div className="bg-white rounded-[32px] border border-slate-200 overflow-hidden shadow-sm">
-           <div className="p-6 border-b border-slate-100 flex gap-4"><div className="flex-1 bg-slate-50 rounded-xl px-4 py-3 flex items-center gap-3"><Search className="text-slate-400"/><input placeholder="Tìm kiếm người dùng..." className="bg-transparent outline-none w-full font-bold text-slate-600"/></div><button className="bg-indigo-600 text-white px-6 rounded-xl font-bold">Tìm kiếm</button></div>
-           <table className="w-full text-left"><thead className="bg-slate-50 text-slate-500 text-xs uppercase font-extrabold tracking-wider"><tr><th className="p-6">User</th><th className="p-6">Role</th><th className="p-6">Status</th><th className="p-6 text-right">Action</th></tr></thead><tbody className="divide-y divide-slate-100"><tr className="hover:bg-slate-50"><td className="p-6 font-bold text-slate-800">Nguyễn Văn A</td><td className="p-6"><span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">Student</span></td><td className="p-6 text-green-600 font-bold">Active</td><td className="p-6 text-right flex justify-end gap-2"><button className="p-2 bg-slate-100 rounded-lg hover:text-indigo-600"><Edit size={16}/></button><button className="p-2 bg-slate-100 rounded-lg text-rose-500 hover:bg-rose-100"><Ban size={16}/></button></td></tr></tbody></table>
+           <div className="p-6 border-b border-slate-100 flex gap-4">
+              <div className="flex-1 bg-slate-50 rounded-xl px-4 py-3 flex items-center gap-3">
+                 <Search className="text-slate-400"/>
+                 <input placeholder="Tìm kiếm người dùng..." className="bg-transparent outline-none w-full font-bold text-slate-600"/>
+              </div>
+              <button className="bg-indigo-600 text-white px-6 rounded-xl font-bold">Tìm kiếm</button>
+           </div>
+           
+           <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                 <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-extrabold tracking-wider">
+                    <tr>
+                       <th className="p-6">User</th>
+                       <th className="p-6">Role</th>
+                       <th className="p-6">Status</th>
+                       <th className="p-6">Joined</th>
+                       <th className="p-6 text-right">Action</th>
+                    </tr>
+                 </thead>
+                 <tbody className="divide-y divide-slate-100">
+                    {mockUsers.map((user) => (
+                       <tr key={user.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-6">
+                             <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-sm ${
+                                   user.role === 'Admin' ? 'bg-slate-900' : 
+                                   user.role === 'Teacher' ? 'bg-purple-600' : 'bg-indigo-500'
+                                }`}>
+                                   {user.name.charAt(0)}
+                                </div>
+                                <div>
+                                   <p className="font-bold text-slate-800">{user.name}</p>
+                                   <p className="text-xs text-slate-400">{user.email}</p>
+                                </div>
+                             </div>
+                          </td>
+                          <td className="p-6">
+                             <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider ${
+                                user.role === 'Admin' ? 'bg-slate-100 text-slate-700' :
+                                user.role === 'Teacher' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600'
+                             }`}>
+                                {user.role}
+                             </span>
+                          </td>
+                          <td className="p-6">
+                             <span className={`flex items-center gap-1.5 text-xs font-bold ${
+                                user.status === 'Active' ? 'text-emerald-600' : 
+                                user.status === 'Banned' ? 'text-rose-600' : 'text-orange-500'
+                             }`}>
+                                <div className={`w-2 h-2 rounded-full ${
+                                   user.status === 'Active' ? 'bg-emerald-500' : 
+                                   user.status === 'Banned' ? 'bg-rose-500' : 'bg-orange-500'
+                                }`}></div>
+                                {user.status}
+                             </span>
+                          </td>
+                          <td className="p-6 text-sm text-slate-500 font-medium">
+                             {user.joined}
+                          </td>
+                          <td className="p-6 text-right flex justify-end gap-2">
+                             <button className="p-2 bg-slate-100 rounded-lg hover:text-indigo-600 transition-all"><Edit size={16}/></button>
+                             <button className={`p-2 rounded-lg transition-all ${user.status === 'Banned' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500 hover:bg-rose-100'}`}>
+                                {user.status === 'Banned' ? <CheckCircle size={16}/> : <Ban size={16}/>}
+                             </button>
+                          </td>
+                       </tr>
+                    ))}
+                 </tbody>
+              </table>
+           </div>
         </div>
       )}
 
