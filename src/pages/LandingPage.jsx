@@ -18,7 +18,7 @@ const LandingPage = ({ onLoginClick }) => {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Chinh phục tri thức</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-slate-300 max-w-2xl">
-            StudyHub cung cấp lộ trình học tập cá nhân hóa từ Tiểu học đến Đại học. Công nghệ AI giúp bạn học nhanh hơn, nhớ lâu hơn.
+            StudyHub cung cấp lộ trình học tập cá nhân hóa từ Tiểu học đến Cấp 3. Công nghệ AI giúp bạn học nhanh hơn, nhớ lâu hơn.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <button onClick={onLoginClick} className="rounded-2xl bg-indigo-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-indigo-500/30 hover:bg-indigo-500 hover:-translate-y-1 transition-all flex items-center gap-2">
