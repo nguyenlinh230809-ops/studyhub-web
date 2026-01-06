@@ -68,30 +68,48 @@ function App() {
     setActiveModal('detail');
   };
 
-  const handleSaveCourse = () => {
+const handleSaveCourse = () => {
     setIsLoading(true);
     const url = formData.id ? '/update.php' : '/add.php';
+    
     const payload = {
-      ...formData,
-      teacher_name: role === 'teacher' ? 'Tôi (GV)' : formData.teacher_name,
-      video: getEmbedLink(formData.video),
-      image: formData.image || 'https://img.freepik.com/free-vector/online-learning-isometric-concept_1284-17947.jpg'
+        ...formData,
+        // SỬA TẠI ĐÂY: Nếu là admin thì ưu tiên lấy tên trong form, nếu gv thì tự điền
+        teacher_name: role === 'admin' ? (formData.teacher_name || 'Hệ thống') : 'Tôi (GV)',
+        video: getEmbedLink(formData.video),
+        image: formData.image || 'https://img.freepik.com/free-vector/online-learning-isometric-concept_1284-17947.jpg'
     };
-    fetch(`${API_URL}${url}`, { method: 'POST', body: JSON.stringify(payload) })
-      .then(r => r.json())
-      .then(d => {
+
+    fetch(`${API_URL}${url}`, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload) 
+    })
+    .then(r => r.json())
+    .then(d => {
         if (d.success) {
-          const cid = formData.id || d.id;
-          fetch(`${API_URL}/save_lessons.php`, { method: 'POST', body: JSON.stringify({ course_id: cid, lessons: formData.lessons }) })
+            const cid = formData.id || d.id;
+            // Gửi mảng lessons để lưu vào database bài giảng
+            fetch(`${API_URL}/save_lessons.php`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ course_id: cid, lessons: formData.lessons }) 
+            })
             .then(() => {
-              alert("✅ Thành công!");
-              setActiveModal(null);
-              fetchData();
+                alert("✅ Thành công: Dữ liệu đã được cập nhật lên hệ thống!");
+                setActiveModal(null);
+                fetchData(); // Cập nhật lại danh sách khóa học để thấy kết quả ngay
             });
-        } else alert("Lỗi: " + d.message);
+        } else {
+            alert("Lỗi: " + d.message);
+        }
         setIsLoading(false);
-      });
-  };
+    })
+    .catch(err => {
+        console.error("Lỗi kết nối:", err);
+        setIsLoading(false);
+    });
+};
 
   const handlePayment = () => {
     const total = cart.reduce((t, c) => t + parseInt(c.price), 0);
@@ -148,7 +166,24 @@ function App() {
               setActiveModal('learning');
             }} />}
           {role === 'teacher' && <TeacherView courses={courses} onOpenUpload={() => { setFormData({ id: null, title: '', price: '', level: 'cap1', teacher_name: '', description: '', video: '', image: '', lessons: [] }); setActiveModal('upload'); }} onEditCourse={(c) => { fetchLessons(c.id, (l) => { setFormData({ ...c, lessons: l }); setActiveModal('upload'); }); }} page={page} />}
-          {role === 'admin' && <AdminView courses={courses} stats={stats} onDeleteCourse={handleDeleteCourse} page={page} />}
+          {/* App.jsx */}
+          {role === 'admin' && (
+            <AdminView 
+              courses={courses} 
+              stats={stats} 
+              onDeleteCourse={handleDeleteCourse} 
+              page={page} 
+              // Tên prop này phải viết chính xác từng chữ cái
+              onAddNewCourse={() => {
+                setFormData({ 
+                  id: null, title: '', price: '', level: 'cap1', 
+                  teacher_name: '', description: '', video: '', 
+                  image: '', lessons: [] 
+                });
+                setActiveModal('upload');
+              }}
+            />
+          )}
         </div>
       </main>
 
@@ -272,54 +307,153 @@ function App() {
         </Modal>
       )}
 
-      {/* --- MODAL UPLOAD (Đã sửa lỗi đóng ngoặc) --- */}
+      {/* --- MODAL UPLOAD NÂNG CẤP --- */}
       {activeModal === 'upload' && (
-        <Modal title={formData.id ? "Cập nhật bài giảng" : "Soạn khóa học mới"} onClose={() => setActiveModal(null)} maxWidth="max-w-4xl">
+        <Modal 
+          title={formData.id ? "Cập nhật nội dung" : (role === 'admin' ? "Hệ thống: Khởi tạo khóa học" : "Soạn khóa học mới")} 
+          onClose={() => setActiveModal(null)} 
+          maxWidth="max-w-4xl"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* CỘT TRÁI: THÔNG TIN CHUNG */}
             <div className="space-y-4">
+              {/* Chỉ Admin mới thấy ô nhập tên Giảng viên để khởi tạo khóa học */}
+              {role === 'admin' && (
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-indigo-600 uppercase">Phân công Giảng viên</label>
+                  <input 
+                    placeholder="Nhập tên giảng viên phụ trách..."
+                    value={formData.teacher_name} 
+                    onChange={e => setFormData({ ...formData, teacher_name: e.target.value })} 
+                    className="w-full p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl font-bold outline-none focus:ring-2 ring-indigo-500" 
+                  />
+                </div>
+              )}
+      
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">Tên khóa học</label>
-                <input value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl font-bold outline-none" />
+                <input 
+                  value={formData.title} 
+                  onChange={e => setFormData({ ...formData, title: e.target.value })} 
+                  className="w-full p-3 bg-slate-50 border rounded-xl font-bold outline-none focus:border-slate-400" 
+                />
               </div>
+      
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase">Học phí</label>
-                  <input type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl font-bold outline-none" />
+                  <label className="text-xs font-bold text-slate-500 uppercase">Học phí (VNĐ)</label>
+                  <input 
+                    type="number" 
+                    value={formData.price} 
+                    onChange={e => setFormData({ ...formData, price: e.target.value })} 
+                    className="w-full p-3 bg-slate-50 border rounded-xl font-bold outline-none" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 uppercase">Cấp độ</label>
-                  <select value={formData.level} onChange={e => setFormData({ ...formData, level: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl outline-none">
-                    <option value="cap1">Tiểu học</option>
-                    <option value="cap2">THCS</option>
-                    <option value="cap3">THPT</option>
+                  <select 
+                    value={formData.level} 
+                    onChange={e => setFormData({ ...formData, level: e.target.value })} 
+                    className="w-full p-3 bg-slate-50 border rounded-xl outline-none font-bold"
+                  >
+                    <option value="cap1">Tiểu học (CAP1)</option>
+                    <option value="cap2">THCS (CAP2)</option>
+                    <option value="cap3">THPT (CAP3)</option>
                   </select>
                 </div>
               </div>
+      
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase">Link Video</label>
-                <input value={formData.video} onChange={e => setFormData({ ...formData, video: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl outline-none" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase">Link Ảnh</label>
-                <input value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl outline-none" />
+                <label className="text-xs font-bold text-slate-500 uppercase">Link Video Giới thiệu</label>
+                <input 
+                  value={formData.video} 
+                  onChange={e => setFormData({ ...formData, video: e.target.value })} 
+                  placeholder="Youtube link..."
+                  className="w-full p-3 bg-slate-50 border rounded-xl outline-none" 
+                />
               </div>
             </div>
-            <div className="bg-slate-50 p-6 rounded-2xl flex flex-col">
-              <button onClick={() => setFormData({ ...formData, lessons: [...formData.lessons, { title: 'Bài mới', type: 'video' }] })} className="text-xs bg-slate-800 text-white px-3 py-1.5 rounded-lg font-bold mb-4">+ Thêm bài</button>
-              <div className="flex-1 overflow-y-auto space-y-3 max-h-80">
+      
+            {/* CỘT PHẢI: QUẢN LÝ DANH SÁCH BÀI GIẢNG (LESSONS) */}
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col">
+              <div className="flex justify-between items-center mb-4">
+                <label className="text-xs font-black text-slate-500 uppercase">Cấu trúc bài giảng ({formData.lessons.length})</label>
+                <button 
+                  onClick={() => setFormData({ ...formData, lessons: [...formData.lessons, { title: '', type: 'video', duration: '15:00' }] })} 
+                  className="text-[10px] bg-slate-900 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-600 transition-colors"
+                >
+                  + THÊM BÀI MỚI
+                </button>
+              </div>
+      
+              <div className="flex-1 overflow-y-auto space-y-3 max-h-[300px] pr-2 custom-scrollbar">
+                {formData.lessons.length === 0 && (
+                  <div className="text-center py-10 text-slate-400 text-xs italic">Chưa có bài giảng nào được thêm.</div>
+                )}
                 {formData.lessons.map((l, i) => (
-                  <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 flex gap-2 items-center">
-                    <input value={l.title} onChange={e => { const n = [...formData.lessons]; n[i].title = e.target.value; setFormData({ ...formData, lessons: n }) }} className="flex-1 text-sm font-bold outline-none" />
-                    <button onClick={() => { const n = [...formData.lessons]; n.splice(i, 1); setFormData({ ...formData, lessons: n }) }}>X</button>
+                  <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div className="flex gap-2 items-center">
+                      <span className="text-[10px] font-black text-slate-400 w-4">{i + 1}</span>
+                      <input 
+                        placeholder="Tên bài học..."
+                        value={l.title} 
+                        onChange={e => {
+                          const n = [...formData.lessons];
+                          n[i].title = e.target.value;
+                          setFormData({ ...formData, lessons: n });
+                        }} 
+                        className="flex-1 text-sm font-bold outline-none" 
+                      />
+                      <button 
+                        className="text-slate-300 hover:text-red-500"
+                        onClick={() => {
+                          const n = [...formData.lessons];
+                          n.splice(i, 1);
+                          setFormData({ ...formData, lessons: n });
+                        }}
+                      >
+                        <Search size={14} className="rotate-45" /> {/* Dùng tạm icon Search xoay làm dấu X nếu không import X */}
+                      </button>
+                    </div>
+                    <div className="flex gap-4">
+                        <select 
+                          value={l.type}
+                          onChange={e => {
+                              const n = [...formData.lessons];
+                              n[i].type = e.target.value;
+                              setFormData({ ...formData, lessons: n });
+                          }}
+                          className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
+                        >
+                            <option value="video">Video</option>
+                            <option value="quiz">Quiz</option>
+                        </select>
+                        <input 
+                          placeholder="Thời lượng (vd: 10:00)"
+                          value={l.duration}
+                          onChange={e => {
+                              const n = [...formData.lessons];
+                              n[i].duration = e.target.value;
+                              setFormData({ ...formData, lessons: n });
+                          }}
+                          className="text-[10px] font-medium text-slate-500 outline-none w-20"
+                        />
+                    </div>
                   </div>
                 ))}
               </div>
-              <button onClick={handleSaveCourse} disabled={isLoading} className="mt-4 w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">Lưu khóa học</button>
+      
+              <button 
+                onClick={handleSaveCourse} 
+                disabled={isLoading || !formData.title} 
+                className={`mt-6 w-full py-4 rounded-xl font-black text-sm tracking-widest transition-all ${isLoading ? 'bg-slate-200 text-slate-400' : 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:scale-[1.02]'}`}
+              >
+                {isLoading ? 'ĐANG XỬ LÝ...' : 'XÁC NHẬN LƯU HỆ THỐNG'}
+              </button>
             </div>
           </div>
         </Modal>
       )}
-
       {/* --- MODAL HỌC TẬP (MÀN HÌNH XEM VIDEO) --- */}
       {activeModal === 'learning' && selectedCourse && (
         <Modal title={`Đang học: ${selectedCourse.title}`} onClose={() => setActiveModal(null)} maxWidth="max-w-7xl">

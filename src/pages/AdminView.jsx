@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { 
   BarChart3, Users, BookOpen, DollarSign, TrendingUp, Trash2, Ban, 
   CheckCircle, Activity, PieChart as PieIcon, Megaphone, Settings, 
-  Search, Edit, Download, ArrowDownLeft, ArrowUpRight, CheckCircle2 
+  Search, Edit, Download, ArrowDownLeft, ArrowUpRight, CheckCircle2,
+  Plus // Thêm icon Plus
 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
-const AdminView = ({ courses, stats, onDeleteCourse, page }) => {
-  // Biến page được truyền từ App.jsx xuống để điều khiển Tab
+// Bổ sung prop onAddNewCourse vào tham số nhận vào
+const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => {
   const activeTab = page === 'home' ? 'dashboard' : page; 
 
   const platformRevenue = stats.revenue * 0.2; 
@@ -18,8 +19,8 @@ const AdminView = ({ courses, stats, onDeleteCourse, page }) => {
 
   return (
     <div className="space-y-8 animate-fade-in-up pb-10">
-      {/* HEADER */}
-      <div className="flex justify-between items-end bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+      {/* HEADER - ĐÃ THÊM NÚT KHỞI TẠO KHÓA HỌC */}
+      <div className="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
         <div>
             <span className="text-xs font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded">CEO Workspace</span>
             <h2 className="text-4xl font-black text-slate-900 mt-2">
@@ -28,20 +29,64 @@ const AdminView = ({ courses, stats, onDeleteCourse, page }) => {
                  activeTab === 'users' ? 'Quản Lý Người Dùng' : 'Marketing & Cấu Hình'}
             </h2>
         </div>
+
+        {/* NÚT CHIẾN LƯỢC: Dành cho Admin tạo nhanh nội dung */}
+        <button 
+          onClick={onAddNewCourse}
+          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black text-sm hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl shadow-slate-200"
+        >
+          <Plus size={20} strokeWidth={3}/>
+          KHỞI TẠO KHÓA HỌC MỚI
+        </button>
       </div>
 
       {/* DASHBOARD TAB */}
       {activeTab === 'dashboard' && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="p-6 rounded-[24px] bg-indigo-600 text-white shadow-xl shadow-indigo-200"><div className="flex justify-between mb-4"><DollarSign className="opacity-80"/><span className="bg-white/20 px-2 py-1 rounded text-xs font-bold">+24%</span></div><h3 className="text-3xl font-black">{formatMoney(totalRevenue)}</h3><p className="text-indigo-200 text-sm font-medium">Tổng GMV</p></div>
-            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-emerald-600"><Activity/><span className="bg-emerald-50 px-2 py-1 rounded text-xs font-bold">+12%</span></div><h3 className="text-3xl font-black text-slate-800">{formatMoney(platformRevenue)}</h3><p className="text-slate-500 text-sm font-medium">Doanh thu Sàn (Net)</p></div>
-            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-blue-600"><Users/><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold">Active</span></div><h3 className="text-3xl font-black text-slate-800">{stats.users || 1240}</h3><p className="text-slate-500 text-sm font-medium">Thành viên</p></div>
-            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-orange-600"><BookOpen/><span className="bg-orange-50 px-2 py-1 rounded text-xs font-bold">New</span></div><h3 className="text-3xl font-black text-slate-800">{courses.length}</h3><p className="text-slate-500 text-sm font-medium">Khóa học</p></div>
+            <div className="p-6 rounded-[24px] bg-indigo-600 text-white shadow-xl shadow-indigo-200">
+              <div className="flex justify-between mb-4"><DollarSign className="opacity-80"/><span className="bg-white/20 px-2 py-1 rounded text-xs font-bold">+24%</span></div>
+              <h3 className="text-3xl font-black">{formatMoney(totalRevenue || 0)}</h3>
+              <p className="text-indigo-200 text-sm font-medium">Tổng GMV</p>
+            </div>
+            {/* Các card khác giữ nguyên nhưng bọc giá trị bằng || 0 để tránh lỗi khi ít dữ liệu */}
+            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-emerald-600"><Activity/><span className="bg-emerald-50 px-2 py-1 rounded text-xs font-bold">+12%</span></div><h3 className="text-3xl font-black text-slate-800">{formatMoney(platformRevenue || 0)}</h3><p className="text-slate-500 text-sm font-medium">Doanh thu Sàn</p></div>
+            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-blue-600"><Users/><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold">Active</span></div><h3 className="text-3xl font-black text-slate-800">{stats.users || 0}</h3><p className="text-slate-500 text-sm font-medium">Thành viên</p></div>
+            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-orange-600"><BookOpen/><span className="bg-orange-50 px-2 py-1 rounded text-xs font-bold">New</span></div><h3 className="text-3xl font-black text-slate-800">{courses.length || 0}</h3><p className="text-slate-500 text-sm font-medium">Khóa học hiện có</p></div>
           </div>
+          
+          {/* Chart Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-sm border border-slate-200"><h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2"><TrendingUp size={20}/> Tăng trưởng dòng tiền</h3><div className="h-72 w-full"><ResponsiveContainer width="100%" height="100%"><AreaChart data={chartData}><defs><linearGradient id="colorR" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/><stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name" axisLine={false} tickLine={false}/><Tooltip/><Area type="monotone" dataKey="value" stroke="#4f46e5" fill="url(#colorR)"/></AreaChart></ResponsiveContainer></div></div>
-            <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-200"><h3 className="font-bold text-slate-800 mb-6">Cơ cấu doanh thu</h3><div className="h-64"><ResponsiveContainer><PieChart><Pie data={pieData} innerRadius={60} outerRadius={80} dataKey="value"><Cell fill="#4f46e5"/><Cell fill="#e2e8f0"/></Pie><Tooltip/></PieChart></ResponsiveContainer></div><div className="flex justify-center gap-4 text-sm font-bold text-slate-600"><span className="flex items-center gap-1"><span className="w-3 h-3 bg-indigo-600 rounded-full"></span>Sàn</span><span className="flex items-center gap-1"><span className="w-3 h-3 bg-slate-200 rounded-full"></span>Đối tác</span></div></div>
+            <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2"><TrendingUp size={20}/> Tăng trưởng dòng tiền</h3>
+              <div className="h-72 w-full">
+                {courses.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <defs><linearGradient id="colorR" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/><stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/></linearGradient></defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name" axisLine={false} tickLine={false}/><Tooltip/><Area type="monotone" dataKey="value" stroke="#4f46e5" fill="url(#colorR)"/></AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-400 italic bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                    Chưa có dữ liệu để lập biểu đồ. Hãy thêm khóa học đầu tiên!
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Pie Chart */}
+            <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-6">Cơ cấu doanh thu</h3>
+              <div className="h-64">
+                <ResponsiveContainer>
+                  <PieChart><Pie data={pieData} innerRadius={60} outerRadius={80} dataKey="value"><Cell fill="#4f46e5"/><Cell fill="#e2e8f0"/></Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex justify-center gap-4 text-sm font-bold text-slate-600">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-indigo-600 rounded-full"></span>Sàn</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-slate-200 rounded-full"></span>Đối tác</span>
+              </div>
+            </div>
           </div>
         </>
       )}
@@ -84,8 +129,9 @@ const AdminView = ({ courses, stats, onDeleteCourse, page }) => {
                             <span className="font-bold text-slate-700">{t.full_name || 'Khách vãng lai'}</span>
                           </div>
                         </td>
+// Ví dụ thay đổi logic hiển thị loại giao dịch
                         <td className="p-6">
-                          {i % 2 === 0 ? (
+                          {t.type === 'income' ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
                               <ArrowDownLeft size={14}/> Thu tiền (IN)
                             </span>
