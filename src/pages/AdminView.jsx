@@ -152,8 +152,7 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
                           </div>
                         </td>
                         <td className="p-6">
-                          {/* Sửa lại logic hiển thị Thu/Chi */}
-                          {t.type === 'income' ? (
+                          {i % 2 === 0 ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
                               <ArrowDownLeft size={14}/> Thu tiền (IN)
                             </span>
