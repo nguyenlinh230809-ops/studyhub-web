@@ -3,21 +3,14 @@ import {
   BarChart3, Users, BookOpen, DollarSign, TrendingUp, Trash2, Ban, 
   CheckCircle, Activity, PieChart as PieIcon, Megaphone, Settings, 
   Search, Edit, Download, ArrowDownLeft, ArrowUpRight, CheckCircle2,
-  Plus, ShieldCheck, UserCircle
+  Plus // Thêm icon Plus
 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
+// Bổ sung prop onAddNewCourse vào tham số nhận vào
 const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => {
   const activeTab = page === 'home' ? 'dashboard' : page; 
-
-  // --- DỮ LIỆU NGƯỜI DÙNG MẪU ---
-  const mockUsers = [
-    { id: 1, name: "Nguyễn Văn A", email: "student.a@gmail.com", role: "Student", status: "Active" },
-    { id: 2, name: "Trần Thị B", email: "teacher.b@studyhub.vn", role: "Teacher", status: "Active" },
-    { id: 3, name: "Lê Văn C", email: "admin.c@studyhub.vn", role: "Admin", status: "Active" },
-    { id: 4, name: "Phạm Minh D", email: "student.d@gmail.com", role: "Student", status: "Banned" },
-  ];
 
   const platformRevenue = stats.revenue * 0.2; 
   const totalRevenue = stats.revenue;
@@ -26,7 +19,7 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
 
   return (
     <div className="space-y-8 animate-fade-in-up pb-10">
-      {/* HEADER */}
+      {/* HEADER - ĐÃ THÊM NÚT KHỞI TẠO KHÓA HỌC */}
       <div className="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
         <div>
             <span className="text-xs font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded">CEO Workspace</span>
@@ -37,16 +30,14 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
             </h2>
         </div>
 
-        {/* CẢI TIẾN 1: Chỉ hiện nút khi ở Tab Dashboard */}
-        {activeTab === 'dashboard' && (
-          <button 
-            onClick={onAddNewCourse}
-            className="flex items-center gap-2 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black text-sm hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl shadow-slate-200"
-          >
-            <Plus size={20} strokeWidth={3}/>
-            KHỞI TẠO KHÓA HỌC MỚI
-          </button>
-        )}
+        {/* NÚT CHIẾN LƯỢC: Dành cho Admin tạo nhanh nội dung */}
+        <button 
+          onClick={onAddNewCourse}
+          className="flex items-center gap-2 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black text-sm hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl shadow-slate-200"
+        >
+          <Plus size={20} strokeWidth={3}/>
+          KHỞI TẠO KHÓA HỌC MỚI
+        </button>
       </div>
 
       {/* DASHBOARD TAB */}
@@ -58,68 +49,46 @@ const AdminView = ({ courses, stats, onDeleteCourse, onAddNewCourse, page }) => 
               <h3 className="text-3xl font-black">{formatMoney(totalRevenue || 0)}</h3>
               <p className="text-indigo-200 text-sm font-medium">Tổng GMV</p>
             </div>
-            {/* ... Các card khác của bạn giữ nguyên ... */}
+            {/* Các card khác giữ nguyên nhưng bọc giá trị bằng || 0 để tránh lỗi khi ít dữ liệu */}
+            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-emerald-600"><Activity/><span className="bg-emerald-50 px-2 py-1 rounded text-xs font-bold">+12%</span></div><h3 className="text-3xl font-black text-slate-800">{formatMoney(platformRevenue || 0)}</h3><p className="text-slate-500 text-sm font-medium">Doanh thu Sàn</p></div>
+            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-blue-600"><Users/><span className="bg-blue-50 px-2 py-1 rounded text-xs font-bold">Active</span></div><h3 className="text-3xl font-black text-slate-800">{stats.users || 0}</h3><p className="text-slate-500 text-sm font-medium">Thành viên</p></div>
+            <div className="p-6 rounded-[24px] bg-white border border-slate-200 shadow-sm"><div className="flex justify-between mb-4 text-orange-600"><BookOpen/><span className="bg-orange-50 px-2 py-1 rounded text-xs font-bold">New</span></div><h3 className="text-3xl font-black text-slate-800">{courses.length || 0}</h3><p className="text-slate-500 text-sm font-medium">Khóa học hiện có</p></div>
           </div>
-          {/* ... Phần Chart của bạn giữ nguyên ... */}
-        </>
-      )}
-
-      {/* USERS TAB - CẢI TIẾN 2: Thêm dữ liệu người dùng động */}
-      {activeTab === 'users' && (
-        <div className="bg-white rounded-[32px] border border-slate-200 overflow-hidden shadow-sm">
-           <div className="p-6 border-b border-slate-100 flex gap-4">
-              <div className="flex-1 bg-slate-50 rounded-xl px-4 py-3 flex items-center gap-3">
-                <Search className="text-slate-400"/>
-                <input placeholder="Tìm kiếm người dùng..." className="bg-transparent outline-none w-full font-bold text-slate-600"/>
+          
+          {/* Chart Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2"><TrendingUp size={20}/> Tăng trưởng dòng tiền</h3>
+              <div className="h-72 w-full">
+                {courses.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <defs><linearGradient id="colorR" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/><stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/></linearGradient></defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name" axisLine={false} tickLine={false}/><Tooltip/><Area type="monotone" dataKey="value" stroke="#4f46e5" fill="url(#colorR)"/></AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-400 italic bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                    Chưa có dữ liệu để lập biểu đồ. Hãy thêm khóa học đầu tiên!
+                  </div>
+                )}
               </div>
-              <button className="bg-indigo-600 text-white px-6 rounded-xl font-bold">Tìm kiếm</button>
-           </div>
-           
-           <div className="overflow-x-auto">
-             <table className="w-full text-left">
-               <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-extrabold tracking-wider">
-                 <tr>
-                   <th className="p-6">Thành viên</th>
-                   <th className="p-6">Vai trò</th>
-                   <th className="p-6">Trạng thái</th>
-                   <th className="p-6 text-right">Thao tác</th>
-                 </tr>
-               </thead>
-               <tbody className="divide-y divide-slate-100">
-                 {mockUsers.map((user) => (
-                   <tr key={user.id} className="hover:bg-slate-50 transition-colors">
-                     <td className="p-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">
-                            {user.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-bold text-slate-800">{user.name}</p>
-                            <p className="text-xs text-slate-400">{user.email}</p>
-                          </div>
-                        </div>
-                     </td>
-                     <td className="p-6">
-                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                          user.role === 'Admin' ? 'bg-slate-900 text-white' : 
-                          user.role === 'Teacher' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
-                        }`}>
-                          {user.role}
-                        </span>
-                     </td>
-                     <td className={`p-6 font-bold text-sm ${user.status === 'Active' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {user.status}
-                     </td>
-                     <td className="p-6 text-right flex justify-end gap-2">
-                        <button className="p-2 bg-slate-50 rounded-lg hover:text-indigo-600 transition-all"><Edit size={16}/></button>
-                        <button className="p-2 bg-slate-50 rounded-lg text-rose-500 hover:bg-rose-100 transition-all"><Ban size={16}/></button>
-                     </td>
-                   </tr>
-                 ))}
-               </tbody>
-             </table>
-           </div>
-        </div>
+            </div>
+            
+            {/* Pie Chart */}
+            <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-6">Cơ cấu doanh thu</h3>
+              <div className="h-64">
+                <ResponsiveContainer>
+                  <PieChart><Pie data={pieData} innerRadius={60} outerRadius={80} dataKey="value"><Cell fill="#4f46e5"/><Cell fill="#e2e8f0"/></Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex justify-center gap-4 text-sm font-bold text-slate-600">
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-indigo-600 rounded-full"></span>Sàn</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-slate-200 rounded-full"></span>Đối tác</span>
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
       {/* FINANCE TAB - ĐÃ SỬA THÀNH DẠNG BẢNG */}
