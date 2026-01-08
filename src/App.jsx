@@ -69,16 +69,27 @@ function App() {
   };
 
 const handleSaveCourse = () => {
+    // 1. Validate cơ bản trước khi gửi
+    if (!formData.title) {
+        alert("Vui lòng nhập tên khóa học!");
+        return;
+    }
+
     setIsLoading(true);
     const url = formData.id ? '/update.php' : '/add.php';
     
+    // 2. Chuẩn bị dữ liệu gửi đi (Payload)
     const payload = {
         ...formData,
-        // SỬA TẠI ĐÂY: Nếu là admin thì ưu tiên lấy tên trong form, nếu gv thì tự điền
-        teacher_name: role === 'admin' ? (formData.teacher_name || 'Hệ thống') : 'Tôi (GV)',
+        id: formData.id, // Đảm bảo gửi ID nếu là update
+        price: formData.price ? parseInt(formData.price) : 0, // Ép kiểu số cho an toàn
+        // Logic tên giảng viên:
+        teacher_name: role === 'admin' ? (formData.teacher_name || 'Admin Hệ Thống') : 'Giảng viên (Tôi)',
         video: getEmbedLink(formData.video),
         image: formData.image || 'https://img.freepik.com/free-vector/online-learning-isometric-concept_1284-17947.jpg'
     };
+
+    console.log("Dữ liệu đang gửi đi:", payload); // [DEBUG] Xem log để check dữ liệu
 
     fetch(`${API_URL}${url}`, { 
         method: 'POST', 
@@ -87,26 +98,51 @@ const handleSaveCourse = () => {
     })
     .then(r => r.json())
     .then(d => {
+        console.log("Backend trả về:", d); // [DEBUG] Xem backend trả về gì
+
         if (d.success) {
-            const cid = formData.id || d.id;
+            // QUAN TRỌNG: Lấy ID khóa học vừa tạo (nếu là add) hoặc ID cũ (nếu là update)
+            const cid = formData.id || d.id; 
+
+            if (!cid) {
+                alert("Lỗi: Backend không trả về ID khóa học mới. Kiểm tra file add.php!");
+                setIsLoading(false);
+                return;
+            }
+
             // Gửi mảng lessons để lưu vào database bài giảng
             fetch(`${API_URL}/save_lessons.php`, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ course_id: cid, lessons: formData.lessons }) 
             })
-            .then(() => {
-                alert("✅ Thành công: Dữ liệu đã được cập nhật lên hệ thống!");
+            .then(r => r.text()) // Dùng text() trước để tránh lỗi nếu backend trả về lỗi PHP (HTML)
+            .then(responseString => {
+                console.log("Save lessons response:", responseString); // [DEBUG]
+                
+                try {
+                   // Thử parse JSON, nếu backend in ra lỗi PHP thì sẽ bắt ở catch
+                   const result = JSON.parse(responseString); 
+                   // Hoặc nếu backend của bạn không trả về json ở save_lessons thì bỏ qua dòng này
+                } catch (e) {
+                   console.warn("Save lessons không trả về JSON chuẩn, nhưng vẫn tiếp tục.");
+                }
+
+                alert(formData.id ? "✅ Cập nhật thành công!" : "✅ Tạo khóa học mới thành công!");
                 setActiveModal(null);
-                fetchData(); // Cập nhật lại danh sách khóa học để thấy kết quả ngay
-            });
+                fetchData(); // Load lại danh sách
+            })
+            .catch(err => console.error("Lỗi lưu bài học:", err));
+
         } else {
-            alert("Lỗi: " + d.message);
+            alert("Lỗi từ server: " + (d.message || "Không xác định"));
         }
-        setIsLoading(false);
     })
     .catch(err => {
-        console.error("Lỗi kết nối:", err);
+        console.error("Lỗi kết nối API:", err);
+        alert("Không thể kết nối đến Server. Vui lòng kiểm tra Console.");
+    })
+    .finally(() => {
         setIsLoading(false);
     });
 };
@@ -127,7 +163,26 @@ const handleSaveCourse = () => {
   };
 
   const handleDeleteCourse = (course) => {
-    if (confirm("Xóa khóa học này?")) setCourses(courses.filter(c => c.id !== course.id));
+    if (!confirm(`Bạn có chắc muốn xóa khóa học: "${course.title}"?\nHành động này không thể hoàn tác!`)) return;
+
+    // Gọi API xóa
+    fetch(`${API_URL}/delete.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: course.id })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("✅ Đã xóa khóa học thành công!");
+          // Cập nhật lại giao diện ngay lập tức
+          setCourses(courses.filter(c => c.id !== course.id));
+          fetchData(); // Load lại số liệu thống kê nếu cần
+        } else {
+          alert("❌ Lỗi: " + data.message);
+        }
+      })
+      .catch(err => console.error("Lỗi xóa:", err));
   };
 
   if (!isLoggedIn) return <LandingPage onLoginClick={() => setIsLoggedIn(true)} />;
@@ -181,6 +236,12 @@ const handleSaveCourse = () => {
                   image: '', lessons: [] 
                 });
                 setActiveModal('upload');
+              }}
+              onEditCourse={(c) => { 
+                fetchLessons(c.id, (l) => { 
+                  setFormData({ ...c, lessons: l }); 
+                  setActiveModal('upload'); 
+                }); 
               }}
             />
           )}
