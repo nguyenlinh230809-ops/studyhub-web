@@ -1,6 +1,6 @@
 // src/utils/helpers.js
 
-export const API_URL = 'http://studyhub-api.42web.io/api'; // <--- Kiểm tra kỹ Port 8080 hay 80
+export const API_URL = 'http://localhost/Course-Online/api'; // <--- Kiểm tra kỹ Port 8080 hay 80
 
 export const getEmbedLink = (url) => {
   if (!url) return '';
