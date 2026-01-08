@@ -1,6 +1,6 @@
 // src/utils/helpers.js
 
-export const API_URL = 'http://localhost:8080/Course-Online/api'; // <--- Kiểm tra kỹ Port 8080 hay 80
+export const API_URL = 'https://ivory-noninjurious-uniaxially.ngrok-free.dev/Course-Online/api'; // <--- Kiểm tra kỹ Port 8080 hay 80
 
 export const getEmbedLink = (url) => {
   if (!url) return '';
